@@ -4,6 +4,14 @@
   "framework": "vite",
   "rewrites": [
     {
+      "source": "/auth/(.*)",
+      "destination": "/api/auth/$1"
+    },
+    {
+      "source": "/analysis/(.*)",
+      "destination": "/api/analysis/$1"
+    },
+    {
       "source": "/api/(.*)",
       "destination": "/api/$1"
     },
