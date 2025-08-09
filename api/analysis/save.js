@@ -29,21 +29,38 @@ export default async function handler(req, res) {
     const userId = decoded.userId;
 
     if (req.method === 'POST') {
-      // Save analysis
+      // Save analysis - updated to match actual database schema
       const analysisData = req.body;
       
       const insertQuery = `
-        INSERT INTO analysis_history (user_id, title, analysis_data, compliance_score, gaps_found, created_at)
-        VALUES ($1, $2, $3, $4, $5, NOW())
-        RETURNING id, title, compliance_score, gaps_found, created_at
+        INSERT INTO analysis_history (
+          user_id, 
+          document_name, 
+          document_type,
+          analysis_type,
+          industry,
+          organization_details,
+          analysis_results,
+          compliance_score, 
+          gaps_found, 
+          frameworks,
+          created_at
+        )
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW())
+        RETURNING id, document_name, compliance_score, gaps_found, created_at
       `;
       
       const result = await pool.query(insertQuery, [
         userId,
-        analysisData.title || 'Policy Analysis',
-        JSON.stringify(analysisData),
-        analysisData.complianceScore || 0,
-        analysisData.gapsFound || 0
+        analysisData.document_name || analysisData.title || 'Policy Analysis',
+        analysisData.document_type || 'pdf',
+        analysisData.analysis_type || 'policy_analysis',
+        analysisData.industry || 'General',
+        analysisData.organization_details || {},
+        analysisData.analysis_results || analysisData,
+        analysisData.analysis_results?.overallScore || analysisData.complianceScore || 0,
+        analysisData.analysis_results?.totalGaps || analysisData.gapsFound || 0,
+        analysisData.frameworks || []
       ]);
 
       res.status(201).json({
@@ -58,7 +75,13 @@ export default async function handler(req, res) {
       const offset = (page - 1) * limit;
 
       const historyQuery = `
-        SELECT id, title, compliance_score, gaps_found, created_at
+        SELECT 
+          id, 
+          document_name, 
+          document_type,
+          compliance_score, 
+          gaps_found, 
+          created_at
         FROM analysis_history 
         WHERE user_id = $1 
         ORDER BY created_at DESC 

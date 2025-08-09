@@ -46,9 +46,21 @@ export default async function handler(req, res) {
     const countResult = await pool.query(countQuery, [userId]);
     const totalCount = parseInt(countResult.rows[0].count);
 
-    // Get analysis history
+    // Get analysis history - updated to match actual database schema
     const historyQuery = `
-      SELECT id, title, analysis_data, compliance_score, gaps_found, created_at, updated_at
+      SELECT 
+        id, 
+        user_id,
+        document_name, 
+        document_type,
+        analysis_type,
+        industry,
+        organization_details,
+        analysis_results, 
+        compliance_score, 
+        gaps_found, 
+        frameworks,
+        created_at
       FROM analysis_history 
       WHERE user_id = $1 
       ORDER BY created_at DESC 

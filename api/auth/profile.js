@@ -29,8 +29,8 @@ export default async function handler(req, res) {
     const userId = decoded.userId;
 
     if (req.method === 'GET') {
-      // Get user profile
-      const userQuery = 'SELECT id, email, user_metadata, created_at FROM users WHERE id = $1';
+      // Get user profile - updated to match actual database schema
+      const userQuery = 'SELECT id, email, first_name, last_name, company, created_at FROM users WHERE id = $1';
       const userResult = await pool.query(userQuery, [userId]);
 
       if (userResult.rows.length === 0) {
@@ -42,23 +42,25 @@ export default async function handler(req, res) {
         user: {
           id: user.id,
           email: user.email,
-          user_metadata: user.user_metadata || {},
+          first_name: user.first_name || '',
+          last_name: user.last_name || '',
+          company: user.company || '',
           created_at: user.created_at
         }
       });
 
     } else if (req.method === 'PUT') {
-      // Update user profile
-      const updates = req.body;
+      // Update user profile - updated to match actual database schema
+      const { first_name, last_name, company } = req.body;
       
       const updateQuery = `
         UPDATE users 
-        SET user_metadata = $1, updated_at = NOW()
-        WHERE id = $2
-        RETURNING id, email, user_metadata, created_at
+        SET first_name = $1, last_name = $2, company = $3, updated_at = NOW()
+        WHERE id = $4
+        RETURNING id, email, first_name, last_name, company, created_at
       `;
       
-      const result = await pool.query(updateQuery, [JSON.stringify(updates), userId]);
+      const result = await pool.query(updateQuery, [first_name, last_name, company, userId]);
       
       if (result.rows.length === 0) {
         return res.status(404).json({ message: 'User not found' });
@@ -70,7 +72,9 @@ export default async function handler(req, res) {
         user: {
           id: user.id,
           email: user.email,
-          user_metadata: user.user_metadata || {},
+          first_name: user.first_name || '',
+          last_name: user.last_name || '',
+          company: user.company || '',
           created_at: user.created_at
         }
       });
