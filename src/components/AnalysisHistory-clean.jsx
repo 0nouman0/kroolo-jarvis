@@ -24,7 +24,7 @@ function AnalysisHistory({ onViewAnalysis }) {
     try {
       setLoading(true);
       const response = await authAPI.getAnalysisHistory(currentPage, 10);
-      setHistory(response.history);
+      setHistory(response.data);
       setPagination(response.pagination);
     } catch (err) {
       setError('Failed to load analysis history');

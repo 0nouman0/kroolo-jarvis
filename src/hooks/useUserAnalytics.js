@@ -45,7 +45,7 @@ export const useUserAnalytics = () => {
 
       // Fetch user's analysis history for analytics
       const historyResponse = await authAPI.getAnalysisHistory(1, 100); // Get more data for analytics
-      const history = historyResponse.history || [];
+      const history = historyResponse.data || [];
 
       // Calculate analytics
       const documentsAnalyzed = history.filter(item => 
