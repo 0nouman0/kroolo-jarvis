@@ -1,7 +1,11 @@
 // Frontend API client - communicates with backend only
 // Database operations are handled by the backend server
 
-const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const apiUrl = import.meta.env.VITE_API_URL || (
+  import.meta.env.MODE === 'production' 
+    ? window.location.origin 
+    : 'http://localhost:3001'
+);
 
 console.log('API URL:', apiUrl);
 
