@@ -174,3 +174,4 @@ playwright/.cache/
 
 # Local history (VSCode)
 .history/
+.vercel
