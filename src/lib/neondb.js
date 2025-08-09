@@ -1,13 +1,32 @@
 // Frontend API client - communicates with backend only
 // Database operations are handled by the backend server
 
-const apiUrl = import.meta.env.VITE_API_URL || (
-  import.meta.env.MODE === 'production' 
-    ? window.location.origin 
-    : 'http://localhost:3001'
-);
+// Determine the API URL based on environment
+const getApiUrl = () => {
+  // In development, use localhost
+  if (import.meta.env.DEV) {
+    return 'http://localhost:3001';
+  }
+  
+  // In production, use the current domain
+  if (typeof window !== 'undefined') {
+    return window.location.origin;
+  }
+  
+  // Fallback for SSR or build time
+  return import.meta.env.VITE_API_URL || 'https://kroolo-jarvis.vercel.app';
+};
+
+const apiUrl = getApiUrl();
 
 console.log('API URL:', apiUrl);
+console.log('Environment info:', {
+  MODE: import.meta.env.MODE,
+  DEV: import.meta.env.DEV,
+  PROD: import.meta.env.PROD,
+  VITE_API_URL: import.meta.env.VITE_API_URL,
+  window_origin: typeof window !== 'undefined' ? window.location.origin : 'SSR'
+});
 
 // API client for authentication and data operations
 class AuthAPI {
